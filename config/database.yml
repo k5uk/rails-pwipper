@@ -12,14 +12,16 @@
 default: &default
   adapter: mysql2
   encoding: utf8
+  reconnect: false
   pool: 5
-  username: root
-  password:
   socket: /tmp/mysql.sock
+  host: localhost
 
 development:
   <<: *default
   database: pwipper_development
+  username: railsuser
+  password: railspass
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -27,6 +29,8 @@ development:
 test:
   <<: *default
   database: pwipper_test
+  username: railsuser
+  password: railspass
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -50,5 +54,5 @@ test:
 production:
   <<: *default
   database: pwipper_production
-  username: pwipper
-  password: <%= ENV['PWIPPER_DATABASE_PASSWORD'] %>
+  username: railsuser
+  password: railspass
