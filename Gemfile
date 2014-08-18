@@ -3,12 +3,18 @@ ruby '2.1.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.4'
+gem 'bootstrap-sass', '2.3.2.0'
+gem 'sprockets', '2.11.0'
 
 group :development, :test do
  # Use mysql as the database for Active Record
  gem 'mysql2'
  # Use rspec
  gem 'rspec-rails','2.13.1'
+ gem 'guard-rspec','2.5.0'
+ gem 'spork-rails','4.0.0'
+ gem 'guard-spork','1.5.0'
+ gem 'childprocess','0.5.3'
 end
 
 group :test do
