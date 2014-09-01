@@ -6,12 +6,13 @@ gem 'rails', '4.1.4'
 gem 'bootstrap-sass', '2.3.2.0'
 gem 'sprockets', '2.11.0'
 gem 'minitest'
+gem 'faker', '1.1.2'
 
 group :development, :test do
  # Use mysql as the database for Active Record
  gem 'mysql2'
  # Use rspec
- gem 'rspec-rails','2.13.1'
+ gem 'rspec-rails'
  gem 'guard-rspec','2.5.0'
  gem 'spork-rails','4.0.0'
  gem 'guard-spork','1.5.0'
