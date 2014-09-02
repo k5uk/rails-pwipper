@@ -8,19 +8,65 @@ describe "User pages" do
   describe "index" do
 
     #擬似ユーザーを作成
+    let(:user) { FactoryGirl.create(:user) }
+
     before do
-      sign_in FactoryGirl.create(:user)
-      FactoryGirl.create(:user, name:"Bob", email:"bob@example.com")
-      FactoryGirl.create(:user, name:"Ben", email:"ben@example.com")
+      sign_in user
       visit users_path
     end
 
     it { should have_title('All users') }
     it { should have_content('All users') }
 
-    it "should list each user" do
-      User.all.each do |user|
-        expect(page).to have_selector('li', text: user.name)
+    #ページネーションが正しく動いているかのテスト
+    describe "paginatiton" do
+
+      #サンプルユーザーの一括作成
+      before(:all) { 30.times { FactoryGirl.create(:user)}}
+
+      #サンプルユーザーの一括削除
+      after(:all) { User.delete_all }
+
+      #ページネーションのdiv表示テスト
+      it { should have_selector('div.pagination') }
+
+      it "should list each user" do
+        User.paginate(page: 1).each do |user|
+          expect(page).to have_selector('li', text: user.name)
+        end
+      end
+    end
+
+    describe "delete links" do
+
+      #一般ユーザーにはこの削除リンクを表示しないことをテスト
+      it { should_not have_link('delete') }
+
+      describe "as an admin user" do
+
+        #adminユーザーの作成
+        let(:admin) { FactoryGirl.create(:admin) }
+
+        before do
+          sign_in admin
+          visit users_path
+        end
+
+        #adminユーザーに削除リンクが表示されていることをテスト
+        it { should have_link('delete', href: user_path(User.first)) }
+
+        it "should be able to delete another user" do
+          expect do
+
+            #削除リンクを持っている最初のユーザーをのeleteボタンをクリック
+            click_link('delete', match: :first)
+
+          #Userカウントが-1だけ変わる
+          end.to change(User, :count).by(-1)
+        end
+
+        #管理者ユーザーの横にはdeleteボタンが表示されないことをテスト
+        it { should_not have_link('delete', href: user_path(admin)) }
       end
     end
   end

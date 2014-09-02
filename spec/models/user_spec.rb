@@ -16,7 +16,26 @@ describe User do
   it { should respond_to(:remember_token)}
   it { should respond_to(:authenticate)}
 
-  it {should be_valid}
+  #admin属性に対するテスト
+  it { should respond_to(:admin) }
+
+  it { should be_valid }
+
+  #admin属性に対するテスト
+  it { should_not be_admin }
+
+  #admin属性に対するテスト
+  describe "with admin attribute set to 'true'" do
+    before do
+      @user.save!
+
+      #toggle!メソッドを使用して、admin属性の状態をfalseからtrueに反転
+      @user.toggle!(:admin)
+    end
+
+    it { should be_admin }
+    #これはユーザーに対してadmin?メソッド (論理値を返す) が使用できる必要があることを (RSpecの論理値慣習に基いて) 示している。
+  end
 
   describe "email address with mixed case" do
     let(:mixed_case_email) { "Foo@ExAMPle.CoM" }

@@ -2,11 +2,30 @@
 <% provide(:title, 'All users') %>
 <h1>All users</h1>
 
+<%# ページネーションメソッドを実装 %>
+<%= will_paginate %>
+
 <ul class="users">
-  <% @users.each do |user| %>
-    <li>
-      <%= gravatar_for user, size: 52 %>
-      <%= link_to user.name, user %>
-    </li>
+
+  <%# インデックスの完全なリファクタリング %>
+  <% if false %>
+    <% @users.each do |user| %>
+
+      <%# インデックスビューで最初のリファクタリング %>
+      <% if false %>
+        <li>
+          <%= gravatar_for user, size: 52 %>
+          <%= link_to user.name, user %>
+        </li>
+      <% end %>
+
+      <%= render user %>
+      <%# renderをパーシャルの名前の文字列に対してではなく、Userクラスのuser変数に対して実行していることに注意！この場合、Railsは自動的に_user.html.erbという名前のパーシャルを探すので、このパーシャルを作成する必要がある。 %>
+    <% end %>
   <% end %>
+  <%= render @users %>
+  <%# Railsは@usersをUserオブジェクトのリストであると推測する。さらに、ユーザーのコレクションを与えて呼び出すと、Railsは自動的にユーザーのコレクションを列挙し、それぞれのユーザーを_user.html.erbパーシャルで出力します (訳注: each doとendで囲む必要がなくなります)。 %>
 </ul>
+
+<%# ページネーションメソッドを実装 %>
+<%= will_paginate %>
