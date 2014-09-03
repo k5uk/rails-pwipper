@@ -1,0 +1,17 @@
+<%# マイクロポスト作成フォームのパーシャル %>
+
+<%# fに@micropostの内容を代入 %>
+<%= form_for(@micropost) do |f| %>
+
+  <%# エラーメッセージを表示 %>
+  <%= render 'shared/error_messages', object: f.object %>
+                                                        <%# object:は値、f.objectは@micropostになる。つまり、object: f.objectはerror_messagesパーシャルの中でobjectという変数名を作成し、このobject変数を使用してカスタムエラーメッセージを作成できる %>
+  <div class="field">
+
+    <%# マイクロポスト作成フォーム %>
+    <%= f.text_area :content, placeholder: "Compose new micropost..." %>
+  </div>
+
+  <%# submitボタン %>
+  <%= f.submit "Post", class: "btn btn-large btn-primary" %>
+<% end %>

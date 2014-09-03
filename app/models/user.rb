@@ -1,4 +1,8 @@
 class User < ActiveRecord::Base
+
+  has_many :microposts, dependent: :destroy
+                                        #ユーザーがユーザー自体が破棄されたときに、そのユーザーに依存するマイクロポスト (つまり特定のユーザーのもの) も破棄されることを指定
+
   has_secure_password
   before_save { self.email = email.downcase }
   before_create :create_remember_token
@@ -14,6 +18,12 @@ class User < ActiveRecord::Base
 
   def User.encrypt(token)
     Digest::SHA1.hexdigest(token.to_s)
+  end
+
+  def feed
+    #user_idが現在のユーザーidと等しいマイクロポスト見つけるためのメソッド。現在は不完全。
+    Micropost.where("user_id = ?", id)
+    #上の疑問符があることで、SQLクエリにインクルードされる前にidが適切にエスケープされることを保証してくれるため、SQLインジェクションと呼ばれる深刻なセキュリティホールを避けることができる。
   end
 
   private

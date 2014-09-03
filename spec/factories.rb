@@ -12,4 +12,10 @@ FactoryGirl.define do
       admin true
     end
   end
+
+  #マイクロポスト作成用。以下のようにマイクロポスト用のファクトリーの定義にuserを含めるだけで、マイクロポストに関連付けられるユーザーのことがFactory Girlに伝わる。
+  factory :micropost do
+    content "Lorem ipsum"
+    user
+  end
 end

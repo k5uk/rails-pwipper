@@ -1,12 +1,36 @@
-<div class="center hero-unit">
-  <h1>Welcome to the Sample App</h1>
+<%# if分岐で表示させる内容を変更する %>
+<% if signed_in? %>
+  <div class="row">
 
-  <h2>This is the home page for the
-    <a href="http://railstutorial.jp/">Ruby on Rails Tutorial</a>
-    sample application.
-  </h2>
+    <aside class="span4">
+      <section>
+        <%# user_infoパーシャルを呼び出し %>
+        <%= render 'shared/user_info' %>
+      </section>
+      <section>
+        <%# micropost_fomパーシャルを呼び出し %>
+        <%= render 'shared/micropost_form' %>
+      </section>
+    </aside>
 
-  <%= link_to "Sign up now!", signup_path, class: "btn btn-large btn-primary" %>
-</div>
+    <%# Homeページにステータスフィードを追加 %>
+    <div class="span8">
+      <h3>Micropost Feed</h3>
+      <%= render 'shared/feed' %>
+    </div>
 
-<%= link_to image_tag("rails.png", alt: "Rails"), 'http://rubyonrails.org/' %>
+  </div>
+<% else %>
+  <div class="center hero-unit">
+    <h1>Welcome to the Sample App</h1>
+
+    <h2>This is the home page for the
+      <a href="http://railstutorial.jp/">Ruby on Rails Tutorial</a>
+      sample application.
+    </h2>
+
+    <%= link_to "Sign up now!", signup_path, class: "btn btn-large btn-primary" %>
+  </div>
+
+  <%= link_to image_tag("rails.png", alt: "Rails"), 'http://rubyonrails.org/' %>
+<% end %>

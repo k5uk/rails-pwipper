@@ -1,0 +1,17 @@
+<%# ユーザー情報サイドバーのパーシャル %>
+
+<a href="<%= user_path(current_user) %>">
+  <%= gravatar_for current_user, size:52 %>
+</a>
+<h1>
+  <%# current_userを表示 %>
+  <%= current_user.name %>
+</h1>
+<span>
+  <%# 自分のプロフィールへのリンク %>
+  <%= link_to "view my profile", current_user %>
+</span>
+<span>
+  <%# マイクロポストの件数をカウント %>
+  <%= pluralize(current_user.microposts.count, "micropost") %>
+</span>

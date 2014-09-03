@@ -1,0 +1,16 @@
+<%# ステータスフィードのパーシャル %>
+
+<%# もし@feed_itemsに何か入っていたら %>
+<% if @feed_items.any? %>
+
+  <ol class="microposts">
+
+    <%# フィードパーシャルを追加 %>
+    <%= render partial: 'shared/feed_item', collection: @feed_items %>
+    <%# フィードアイテムとして:collectionパラメーターを渡しているので、renderはコレクションの各アイテムを表示するために与えられたパーシャル (この場合は’feed_item’)を使用してくれる。(以前の表示では、render ’shared/micropost’のように:partialパラメーターを省略していたが、:collectionパラメーターがある場合はこの記法では正常に動作しない。)   %>
+
+  </ol>
+  <%# paginationを実装 %>
+  <%= will_paginate @feed_items %>
+
+<% end %>

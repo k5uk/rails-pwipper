@@ -29,6 +29,25 @@ describe "StaticPages" do
 
     it_should_behave_like "all static pages"
     it { should_not have_title('| Home') }
+
+    describe "for siigned_in users" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+        FactoryGirl.create(:micropost, user: user, content: "hogehoge")
+        sign_in user
+        visit root_path
+      end
+
+      it "should render the user's feed" do
+        user.feed.each do |item|
+
+          #各フィード項目が固有のCSS idを持つことを前提にしている。
+          expect(page).to have_selector("li##{item.id}", text: item.content)
+          #上のコードが各アイテムに対してマッチするようにするのが目的
+        end
+      end
+    end
   end
 
   describe "Help page" do

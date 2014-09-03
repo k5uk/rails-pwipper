@@ -8,4 +8,18 @@
       </h1>
     </section>
   </aside>
+  <div class="span8">
+    <%# ユーザーのマイクロポストが1つもない場合に、空のリストが表示されないようにする %>
+    <% if @user.microposts.any? %>
+     <%# そのユーザーのツイート件数を表示 %>
+      <h3>Microposts (<%= @user.microposts.count %>)</h3>
+      <ol class="microposts">
+        <%# ツイート一覧を表示。OLタグは順序のあるリストを表示するタグ %>
+        <%= render @microposts %>
+      </ol>
+      <%# ツイートのページネーションを表示 %>
+      <%= will_paginate @microposts %>
+                                          <%# このインスタンス変数は、ActiveRecord::Relationクラスのインスタンス %>
+    <% end %>
+  </div>
 </div>

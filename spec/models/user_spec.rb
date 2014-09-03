@@ -15,9 +15,16 @@ describe User do
   it { should respond_to(:password_confirmation)}
   it { should respond_to(:remember_token)}
   it { should respond_to(:authenticate)}
+  it { should respond_to(:feed) }
 
   #admin属性に対するテスト
   it { should respond_to(:admin) }
+
+  #microposts属性に対するテスト
+  it { should respond_to(:microposts) }
+
+  #feed属性に対するテスト
+  it { should respond_to(:feed) }
 
   it { should be_valid }
 
@@ -129,5 +136,60 @@ describe User do
   describe "remember token" do
     before { @user.save }
     its(:remember_token) { should_not be_blank}
+  end
+
+  describe "micropost associations" do
+
+    before { @user.save }
+
+    #「let!」を使って強制的にマイクロポストを作成
+    let!(:older_micropost) do
+      FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
+    end
+    let!(:newer_micropost) do
+      FactoryGirl.create(:micropost, user: @user, created_at: 1.hour.ago)
+    end
+
+    it "should have the right microposts in the right order" do
+
+      #新しいポストが最初に来ることをテスト
+
+      #デフォルトでは id順に並ぶため[older_micropost, newer_micropost]の順序になりテストは失敗するはず。
+
+      #またこのテストは、user.micropostsが有効なマイクロポストの配列を返すことをチェックすることにより、基本的なhas_many関連付け自体の正しさも確認している。
+
+      #to_aメソッドは、 @user.micropostsをデフォルトの状態から正しい配列に変換。変換された配列は、手作りの配列と比較可能になる。
+      expect(@user.microposts.to_a).to eq [newer_micropost, older_micropost]
+    end
+
+    #ユーザーを破棄するとマイクロポストも破棄されることをテスト
+    it "should destroy associated microposts" do
+
+      #micropostsという変数にmicropostsの中身をコピー
+      microposts = @user.microposts.to_a
+
+      #ユーザーを削除
+      @user.destroy
+
+      #一種のセフティチェックの役割も果たしており、うっかりto_aメソッドを付け忘れたときのエラーをすべてキャッチ
+      expect(microposts).not_to be_empty
+
+      # マイクロポストがデータベースからなくなったことを確認
+      microposts.each do |micropost|
+        expect(Micropost.where(id: micropost.id)).to be_empty
+      end
+    end
+
+    #ステータスフィードのテスト
+    describe "status" do
+      let(:unfollowed_post) do
+        FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
+      end
+
+      #feedメソッドが自分のマイクロポストは含むが他ユーザーのマイクロポストは含まないことをテスト。このテストでは、与えられた要素が配列に含まれているかどうかをチェックするinclude?メソッドを使用
+      its(:feed) { should include(newer_micropost) }
+      its(:feed) { should include(older_micropost) }
+      its(:feed) { should_not include(unfollowed_post) }
+    end
   end
 end
