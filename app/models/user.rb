@@ -3,6 +3,24 @@ class User < ActiveRecord::Base
   has_many :microposts, dependent: :destroy
                                         #ユーザーがユーザー自体が破棄されたときに、そのユーザーに依存するマイクロポスト (つまり特定のユーザーのもの) も破棄されることを指定
 
+  #ユーザー/リレーションシップのhas_manyの関連付けを実装
+  has_many :relationships, foreign_key: "follower_id", dependent: :destroy
+  #ユーザーを削除したら、ユーザーのリレーションシップも同時に削除される必要がある。そのため、関連付けにdependent: :destroyを追加している。
+
+  #Userモデルのfollowed_users関連付けを追加
+  has_many :followed_users, through: :relationships, source: :followed
+
+  #逆リレーションシップのためにわざわざデータベーステーブルを1つ余分に作成するようなことはしなくてOK。
+
+  #代わりに、フォロワーとフォローしているユーザーの関係が対称的であることを利用し、単にfollowed_idを主キーとして渡すことでreverse_relationshipsをシミュレートすればいい。
+
+  #すなわち、
+  has_many :reverse_relationships, foreign_key: "followed_id", class_name: "Relationship", dependent: :destroy
+  #クラス名を明示的に含める必要があることに注意。これをしていないと、Railsは実在しないReverseRelationshipクラスを探しに行ってしまう。
+
+  has_many :followers, through: :reverse_relationships, source: :follower
+  #ここではsourceキーを省略してもOK。理由は、:followers属性の場合、Railsが “followers” を単数形にして自動的に外部キーfollower_idを探してくれるから。
+
   has_secure_password
   before_save { self.email = email.downcase }
   before_create :create_remember_token
@@ -21,9 +39,26 @@ class User < ActiveRecord::Base
   end
 
   def feed
+
     #user_idが現在のユーザーidと等しいマイクロポスト見つけるためのメソッド。現在は不完全。
     Micropost.where("user_id = ?", id)
     #上の疑問符があることで、SQLクエリにインクルードされる前にidが適切にエスケープされることを保証してくれるため、SQLインジェクションと呼ばれる深刻なセキュリティホールを避けることができる。
+
+  end
+
+  #following?ユーティリティメソッド
+  def following?(other_user)
+    relationships.find_by(followed_id: other_user.id)
+  end
+
+  #follow! ユーティリティメソッド
+  def follow!(other_user)
+    relationships.create!(followed_id: other_user.id)
+  end
+
+  #ユーザーのリレーションシップを削除してフォロー解除
+  def unfollow!(other_user)
+    relationships.find_by(followed_id: other_user.id).destroy
   end
 
   private

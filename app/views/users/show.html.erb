@@ -7,8 +7,20 @@
         <%= @user.name %>
       </h1>
     </section>
+
+    <%# ユーザープロファイルページにフォロワーの統計情報を追加 %>
+    <section>
+      <%= render 'shared/stats' %>
+    </section>
+
+    <%# ユーザープロファイルページにフォロー用のフォームを追加 %>
+    <section>
+      <%= render 'follow_form' if signed_in? %>
+    </section>
+
   </aside>
   <div class="span8">
+
     <%# ユーザーのマイクロポストが1つもない場合に、空のリストが表示されないようにする %>
     <% if @user.microposts.any? %>
      <%# そのユーザーのツイート件数を表示 %>

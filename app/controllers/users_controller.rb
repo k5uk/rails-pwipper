@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
 
   #サインインしているユーザーしか、編集と更新、インデックスの閲覧、削除ができないようにする。
-  before_action :signed_in_user, only: [:index, :edit, :update, :destroy]
+  before_action :signed_in_user, only: [:index, :edit, :update, :destroy, :following, :followers]
 
   #正規のユーザーしか、編集と更新ができないようにする。
   before_action :correct_user, only: [:edit, :update]
@@ -51,6 +51,26 @@ class UsersController < ApplicationController
 
     flash[:success] = "User destroyed."
     redirect_to users_url
+  end
+
+  #フォロー中のユーザー一覧アクションを定義
+  def following
+    @title = "Following"
+    @user = User.find(params[:id])
+    @users = @user.followed_users.paginate(page: params[:page])
+
+    render 'show_follow'
+    #renderを明示的に呼び出していることに注意。ここでは、作成の必要なshow_followというビューを出力している。renderで呼び出しているビューが同じである理由は、このERbはどちらの場合でもほぼ同じであり、両方の場合をカバーできるため。
+
+  end
+
+  #フォロワー一覧アクションを定義
+  def followers
+    @title = "Followers"
+    @user = User.find(params[:id])
+    @users = @user.followers.paginate(page: params[:page])
+    render 'show_follow'
+    #renderを明示的に呼び出していることに注意
   end
 
 private

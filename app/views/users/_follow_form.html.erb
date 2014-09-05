@@ -1,0 +1,15 @@
+<%# フォロー/フォロー解除ボタン用のパーシャル 。新しいリレーションシップを作成することが目的 %>
+
+<%# @userがcurrent_userでなければ %>
+<% unless current_user?(@user) %>
+  <div id="follow_form">
+    <%# もしcurrent_userが@userをフォローしていれば %>
+    <% if current_user.following?(@user) %>
+      <%# アンフォローを表示 %>
+      <%= render 'unfollow' %>
+    <% else %>
+      <%# フォローを表示 %>
+      <%= render 'follow' %>
+    <% end %>
+  </div>
+<% end %>

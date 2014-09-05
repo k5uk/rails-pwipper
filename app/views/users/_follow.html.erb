@@ -1,0 +1,12 @@
+<%# ユーザーをフォローするフォーム %>
+
+<%= form_for(current_user.relationships.build(followed_id: @user.id), remote: true) do |f| %>
+<%# POSTリクエストを Relationshipsコントローラに送信してリレーションシップをcreate (作成) %>
+<%# remote: trueを使ってajaxを実現 %>
+
+  <div><%= f.hidden_field :followed_id %></div>
+  <%# それでもこのフォームはfollowed_idをコントローラに送信する必要がある。そのためにhidden_fieldを使う %>
+
+  <%= f.submit "Follow", class: "btn btn-large btn-primary" %>
+  <%# UI的にはボタンしかないことに注目 %>
+<% end %>

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "StaticPages" do
 
-  subject {page}
+  subject { page }
 
   shared_examples_for "all static pages" do
     it { should have_content(heading) }
@@ -10,7 +10,7 @@ describe "StaticPages" do
   end
 
   describe "Home page" do
-    before {visit root_path}
+    before { visit root_path }
     let(:heading)    { 'Sample App' }
     let(:page_title) { '' }
     it "should have the right links on the layout" do
@@ -30,7 +30,7 @@ describe "StaticPages" do
     it_should_behave_like "all static pages"
     it { should_not have_title('| Home') }
 
-    describe "for siigned_in users" do
+    describe "for signed_in users" do
       let(:user) { FactoryGirl.create(:user) }
       before do
         FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
@@ -46,6 +46,30 @@ describe "StaticPages" do
           expect(page).to have_selector("li##{item.id}", text: item.content)
           #上のコードが各アイテムに対してマッチするようにするのが目的
         end
+      end
+
+      #Homeページ上の、フォローしているユーザー/フォロワーの統計情報をテスト
+      describe "follower/following counts" do
+
+        #other_userを作成
+        let(:other_user) { FactoryGirl.create(:user) }
+
+        before do
+
+          #other_userがユーザーをフォロー
+          other_user.follow!(user)
+          #root_pathに移動
+          visit root_path
+        end
+
+        #"0 following"という名前でフォローしているユーザー一覧へのリンクが存在するかチェック
+        it { should have_link("0 following", href: following_user_path(user)) }
+
+        #"1 followers"という名前でフォローされているユーザー一覧へのリンクが存在するかチェック
+        it { should have_link("1 followers", href: followers_user_path(user)) }
+
+        #正しいアドレスへのリンクを確認していることに注目
+
       end
     end
   end

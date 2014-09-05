@@ -1,0 +1,25 @@
+<%# フォローしているユーザーとフォロワーの統計情報を表示するパーシャル %>
+
+<%# 「||=」は左の変数が偽か未定義であれば右の内容を左に代入するという意味 。ユーザー表示ページとHomeページの両方に表示されるので、以下のコードを使用して適切な方を選択している。@userが nilでない場合 (つまりプロファイルページの場合) は何もせず、nilの場合 (つまりHomeページの場合) には@userにカレントユーザーを設定する %>
+<% @user ||= current_user %>
+
+<div class="stats">
+  <a href="<%= following_user_path(@user) %>">
+
+    <strong id="following" class="stat">
+    <%# CSS idを指定していることにもぜひ注目。こうしておくと、11.2.5でAjaxを実装するときに便利。そこでは、一意のidを指定してページ要素にアクセスしている %>
+
+      <%# フォローしているユーザーの人数は以下の関連付けを使用して計算している %>
+      <%= @user.followed_users.count %>
+    </strong>
+    following
+  </a>
+  <a href="<%= followers_user_path(@user) %>">
+    <strong id="followers" class="stat">
+
+      <%# フォロワーの人数は、以下の関連付けを使用して計算している %>
+      <%= @user.followers.count %>
+    </strong>
+    followers
+  </a>
+</div>

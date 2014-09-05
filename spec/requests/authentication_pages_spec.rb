@@ -6,7 +6,6 @@ describe "Authentication" do
 
   describe "signin page" do
     before { visit signin_path }
-
     it { should have_content('Sign in') }
     it { should have_title('Sign in') }
   end
@@ -16,8 +15,8 @@ describe "Authentication" do
     before { visit signin_path }
 
     describe "with invalid information" do
-      before { click_button "Sign in" }
 
+      before { click_button "Sign in" }
       it { should have_title('Sign in') }
       it { should have_selector('div.alert.alert-error', text: 'Invalid') }
 
@@ -29,7 +28,7 @@ describe "Authentication" do
 
     describe "with valid information" do
       let(:user) { FactoryGirl.create(:user) }
-      before { sign_in user}
+      before { sign_in user }
 
       it { should have_title(user.name) }
 
@@ -59,28 +58,15 @@ describe "Authentication" do
           fill_in "Email", with: user.email
           fill_in "Password", with: user.password
           click_button "Sign in"
-      end
+        end
 
-      describe "after signing in" do
-        it "should render the desired protected page" do
-          expect(page).to have_title('Edit user')
+
+        describe "after signing in" do
+          it "should render the desired protected page" do
+            expect(page).to have_title('Edit user')
+          end
         end
       end
-    end
-
-    #マイクロポストのcreateアクションとdestoryアクションは、いずれもユーザーがサインインしていなければ実行できないということの確認テスト
-    describe "in the Microposts controller" do
-
-      describe "submitting to the create action" do
-        before { post microposts_path }
-        specify { expect(response).to redirect_to(signin_path) }
-      end
-
-      describe "submitting to the destroy action" do
-        before { delete micropost_path(FactoryGirl.create(:micropost)) }
-        specify { expect(response).to redirect_to(signin_path) }
-      end
-    end
 
       describe "in the Users controller" do
 
@@ -100,6 +86,51 @@ describe "Authentication" do
           it { should have_title('Sign in') }
         end
 
+        #フォローしているユーザー用ページとフォロワー用ページでの認可をテスト
+        describe "visiting the following page" do
+          before { visit following_user_path(user) }
+          it { should have_title('Sign in') }
+        end
+
+        describe "visiting the followers page" do
+          before { visit followers_user_path(user) }
+          it { should have_title('Sign in') }
+        end
+      end
+
+      #Relationshipsコントローラの認可をテスト
+      describe "in the Relationships controller" do
+        describe "submitting to the create action" do
+
+          #relationships_pathにポスト
+          before { post relationships_path }
+
+          #サインインページにリダイレクト
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+
+          #relationships_pathを1つ削除
+          before { delete relationship_path(1) }
+          #すぐ削除されるので事実上意味のないRelationshipオブジェクトをわざわざ作成することによるオーバーヘッドを回避するために、deleteテストでは名前付きルートにid 1をハードコードする。
+
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+      end
+
+      #マイクロポストのcreateアクションとdestoryアクションは、いずれもユーザーがサインインしていなければ実行できないということの確認テスト
+      describe "in the Microposts controller" do
+
+        describe "submitting to the create action" do
+          before { post microposts_path }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+          before { delete micropost_path(FactoryGirl.create(:micropost)) }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
       end
     end
 

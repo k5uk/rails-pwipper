@@ -15,7 +15,6 @@ describe User do
   it { should respond_to(:password_confirmation)}
   it { should respond_to(:remember_token)}
   it { should respond_to(:authenticate)}
-  it { should respond_to(:feed) }
 
   #admin属性に対するテスト
   it { should respond_to(:admin) }
@@ -26,10 +25,23 @@ describe User do
   #feed属性に対するテスト
   it { should respond_to(:feed) }
 
-  it { should be_valid }
+  #user.relationships属性のテスト
+  it { should respond_to(:relationships) }
+
+  #user.followed_users属性のテスト
+  it { should respond_to(:followed_users) }
+
+  #逆リレーションシップのテスト
+  it { should respond_to(:reverse_relationships) }
+
+  #フォロワー属性に対するテスト
+  it { should respond_to(:followers) }
 
   #admin属性に対するテスト
   it { should_not be_admin }
+
+  it { should be_valid }
+
 
   #admin属性に対するテスト
   describe "with admin attribute set to 'true'" do
@@ -190,6 +202,49 @@ describe User do
       its(:feed) { should include(newer_micropost) }
       its(:feed) { should include(older_micropost) }
       its(:feed) { should_not include(unfollowed_post) }
+    end
+  end
+
+  # “フォロー用の” ユーティリティメソッドをいくつかテスト
+  describe "following" do
+
+    #other_userを作成
+    let(:other_user) { FactoryGirl.create(:user) }
+
+    before do
+      #ユーザーを保存
+      @user.save
+      #ユーザーをフォロー
+      @user.follow!(other_user)
+      #follow!メソッドは、relationships関連付けを経由してcreate!を呼び出すことで、「フォローする」のリレーションシップを作成する。
+
+    end
+
+    #other_userをフォローしているべきである
+    it { should be_following(other_user) }
+
+    #フォローする相手のユーザーがデータベース上に存在するかどうかをチェック
+    its(:followed_users) { should include(other_user) }
+
+    describe "followed user" do
+
+      subject { other_user }
+      #subjectメソッドを使用して@userからother_userに対象を切り替えていることで、フォロワーのリレーションシップのテストを自然に実行できる。
+
+      #@userがother_userをフォローした時点で、other_userのフォロワーに@userが含まれることになる。これはother_userのフォローデータベースにother_userが含まれていることをテストしている。
+      its(:followers) { should include(@user) }
+    end
+
+    #ユーザーのフォロー解除をテスト
+    describe "and unfollowing" do
+      before { @user.unfollow!(other_user) }
+
+      #other_userがフォローされているべきではない
+      it { should_not be_following(other_user) }
+
+      #ふぉろーしてしたユーザーがデータベース上に存在していないことをチェック
+      its(:followed_users) { should_not include(other_user) }
+
     end
   end
 end
