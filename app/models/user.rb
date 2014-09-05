@@ -39,11 +39,7 @@ class User < ActiveRecord::Base
   end
 
   def feed
-
-    #user_idが現在のユーザーidと等しいマイクロポスト見つけるためのメソッド。現在は不完全。
-    Micropost.where("user_id = ?", id)
-    #上の疑問符があることで、SQLクエリにインクルードされる前にidが適切にエスケープされることを保証してくれるため、SQLインジェクションと呼ばれる深刻なセキュリティホールを避けることができる。
-
+    Micropost.from_users_followed_by(self)
   end
 
   #following?ユーティリティメソッド

@@ -198,10 +198,32 @@ describe User do
         FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
       end
 
+      #リスト11.41 ステータスフィードの最終テスト
+      #followed_userの作成
+      let(:followed_user) { FactoryGirl.create(:user) }
+
+      before do
+        #@userがfollowed_userをフォロー
+        @user.follow!(followed_user)
+        #followed_userのマイクロポストを3回作成
+        3.times { followed_user.microposts.create!(content: "Lorem ipsum" ) }
+      end
+
       #feedメソッドが自分のマイクロポストは含むが他ユーザーのマイクロポストは含まないことをテスト。このテストでは、与えられた要素が配列に含まれているかどうかをチェックするinclude?メソッドを使用
       its(:feed) { should include(newer_micropost) }
       its(:feed) { should include(older_micropost) }
       its(:feed) { should_not include(unfollowed_post) }
+
+      #リスト11.41 ステータスフィードの最終テスト
+      its(:feed) do
+
+        #ffollowed_userのマイクロポストをmicropostに代入して
+        followed_user.microposts.each do |micropost|
+
+          #feedにマイクロポストのコンテンツが含まれていることを確認する
+          should include(micropost)
+        end
+      end
     end
   end
 
