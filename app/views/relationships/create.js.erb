@@ -1,4 +1,4 @@
 <%# JavaScript組み込みRubyを使用してフォローのリレーションシップを作成。js.erbの文法としてはまず、ドル記号 ($) を使用してDOM要素に一意のCSS idでアクセス。#シンボルを使用してCSSのidを指定。jQueryはCSSと同様、ドット.を使用してCSSクラスを操作できる。必要なメソッドはhtmlです。今回のケースでいうとは、引数の中で指定された要素の内側にあるHTMLを更新する。フォロー用のフォームをunfollowパーシャルで更新し、フォロワーのカウントを更新するのにERbを使用。このコードではescape_javascript関数を使用していることに注目。この関数は、JavaScriptファイル内にHTMLを挿入するときに実行結果をエスケープする (画面に表示しない) ために必要。 %>
 
 $("#follow_form").html("<%= escape_javascript(render('users/unfollow')) %>")
-&("#followers").html('<%= @user.followers.count %>')
+$("#followers").html('<%= @user.followers.count %>')
